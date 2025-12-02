@@ -12,9 +12,9 @@ int main() {
     printf("Inserisci il secondo numero: ");
     scanf("%f",&b);
 
-    media = (a+b)/2;
+    media = (a+b) / 2;
 
-    printf("La media aritmetica è: %f", media);
+    printf("La media aritmetica è: %.1f", media);
 
     return 0;
 }
