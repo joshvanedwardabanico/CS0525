@@ -9,4 +9,5 @@
 ### 2. Contenuto Bonus
 * **File:** `Progetto_S3_L5__non_serio_.pdf`
 * **Descrizione:** Questo file è un'aggiunta opzionale.
-* **Contesto:** Si tratta di un "plus" narrativo/creativo che crea un collegamento diretto con la consegna della **UNIT_2/S5/L1**. Può essere ignorato ai fini della valutazione tecnica, ma completa il quadro generale del progetto.
+* **Contesto:** Si tratta di un "plus" narrativo/creativo che crea un collegamento diretto con la consegna della **UNIT_2/S5/L1** `Consegna_U2_S1_L1.pdf`. Può essere ignorato ai fini della valutazione tecnica, ma completa il quadro generale del progetto.
+
