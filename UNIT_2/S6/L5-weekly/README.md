@@ -4,13 +4,13 @@ Questo repository contiene la documentazione tecnica e le evidenze del laborator
 
 Il progetto si concentra sull'analisi della robustezza delle credenziali per i protocolli **SSH** e **FTP**, dimostrando la vulnerabilità dei sistemi a fronte di password deboli e attacchi automatizzati.
 
-## 📄 Contenuto del Repository
+## Contenuto del Repository
 
 * **Report Tecnico (PDF/LaTeX):** Analisi dettagliata della metodologia, esecuzione e risultati. `Progetto_S6_L5.pdf`
 * **Proof of Concept (PoC):** Screenshot e log dell'attività svolta con Hydra.
 * **Codice Sorgente LaTeX:** I file sorgente utilizzati per generare il report finale. `Progetto_S6_L5.tex`
 
-## ecnologie e Strumenti Utilizzati
+## Tecnologie e Strumenti Utilizzati
 
 * **OS Attaccante:** Kali Linux
 * **Tool di Cracking:** [Hydra](https://github.com/vanhauser-thc/thc-hydra) (Network Logon Cracker)
@@ -40,4 +40,5 @@ Utilizzo di Hydra per testare le credenziali contro l'indirizzo IP target.
 Questo progetto è stato realizzato esclusivamente a scopo didattico nell'ambito del corso di Cyber Security & Ethical Hacking. Tutte le attività di test sono state condotte in un ambiente di laboratorio controllato e isolato (macchine virtuali locali). L'autore non si assume alcuna responsabilità per l'uso improprio delle informazioni contenute in questo repository.
 
 **Autore**: Josh Van Edward Abanico **Corso**: Cyber Security & Ethical Hacking - CS0525IT - Epicode
+
 
