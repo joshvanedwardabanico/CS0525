@@ -1,0 +1,218 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{titlesec}
+
+% Configurazione pagina
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+% Configurazione Header e Footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Josh V. E. Abanico - CS0525IT}
+\lhead{\textbf{Progetto S6/L5 - Authentication Cracking}}
+\cfoot{\thepage}
+
+% Configurazione colori per il codice
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegray},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\title{
+    \vspace{2cm}
+    \textbf{\huge Report Tecnico: Authentication Cracking} \\
+    \vspace{0.5cm}
+    \Large Analisi di vulnerabilità mediante attacchi a dizionario su protocolli di rete (SSH/FTP) \\
+    \vspace{1cm}
+    \textbf{Corso:} Cyber Security \& Ethical Hacking \\
+    \textbf{Modulo:} U2 S6 L5
+}
+\author{\textbf{Josh Van Edward Abanico} \\ CS0525IT}
+\date{16 Gennaio 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+\tableofcontents
+\newpage
+
+% -------------------------------------------------------------------
+% SEZIONE 1: INTRODUZIONE
+% -------------------------------------------------------------------
+\section{Introduzione e Obiettivi}
+
+Il presente report documenta l'attività di laboratorio svolta nell'ambito del progetto S6/L5. L'obiettivo principale è dimostrare la vulnerabilità dei servizi di rete configurati con credenziali deboli attraverso l'utilizzo di strumenti di \textit{password cracking} automatizzati.
+
+Nello specifico, l'analisi si concentra su:
+\begin{itemize}
+    \item \textbf{Fase 1:} Attacco al servizio SSH (Secure Shell) tramite attacco a dizionario.
+    \item \textbf{Fase 2:} Configurazione e attacco al servizio FTP (File Transfer Protocol).
+\end{itemize}
+
+Lo strumento principale utilizzato per l'audit è \textbf{Hydra}, un software di login cracker parallelizzato che supporta numerosi protocolli.
+
+% -------------------------------------------------------------------
+% SEZIONE 2: METODOLOGIA
+% -------------------------------------------------------------------
+\section{Metodologia e Setup}
+
+L'ambiente di test è stato configurato utilizzando una macchina attaccante (Kali Linux) e un target configurato localmente all'interno della stessa rete virtuale.
+
+\subsection{Specifiche del Target}
+\begin{itemize}
+    \item \textbf{IP Target:} 192.168.50.151
+    \item \textbf{Servizi Attivi:} SSH (Porta 22), FTP (Porta 21 - in configurazione).
+    \item \textbf{Liste utilizzate:} Sono state impiegate le wordlist della collezione \textit{Seclists} (xato-usernames e xato-passwords) per simulare uno scenario realistico di brute-force non mirato.
+\end{itemize}
+\subsection{Preparazione e Ottimizzazione delle Wordlist}
+Poiché le wordlist originali della raccolta \textit{Seclists} (Xato-net-10-million) contengono milioni di voci, l'utilizzo diretto avrebbe richiesto tempi di esecuzione eccessivi per questa simulazione.
+
+È stato quindi eseguito un filtraggio preventivo per creare dizionari ridotti e mirati. Utilizzando i comandi \texttt{grep} e \texttt{head}, sono state estratte le prime 15 occorrenze contenenti la stringa "test" (coerente con l'account target \texttt{test\_user}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{screen_grep.png}
+    \caption{Screen del terminale: comandi utilizzati per filtrare e ridirezionare l'output nelle nuove wordlist.}
+    \label{fig:wordlist_prep}
+\end{figure}
+
+Questa operazione ha generato due file di testo leggeri \textit{xato-passwords.txt} e \textit{xato-usernames.txt} utilizzati successivamente da Hydra.
+
+\newpage
+% -------------------------------------------------------------------
+% SEZIONE 3: ANALISI TECNICA - SSH
+% -------------------------------------------------------------------
+\section{Fase 1: Attacco al servizio SSH}
+
+Nella prima fase, è stato verificato il livello di sicurezza del servizio SSH. Dopo aver confermato che il servizio fosse attivo e raggiungibile, è stato lanciato un attacco utilizzando Hydra.
+
+\subsection{Esecuzione dell'Attacco}
+Il comando lanciato da terminale è il seguente:
+
+\begin{lstlisting}[language=bash]
+hydra -L xato-usernames.txt -P xato-passwords.txt 192.168.50.151 -t 2 ssh -V
+\end{lstlisting}
+
+\begin{itemize}
+    \item \textbf{-L / -P:} Indica l'uso di liste di username e password (input massivo).
+    \item \textbf{-t 2:} Limita il numero di task (thread) a 2 per evitare di sovraccaricare il servizio o causare un blocco immediato.
+    \item \textbf{-V:} Modalità "Verbose" per visualizzare i tentativi in tempo reale.
+\end{itemize}
+
+\subsection{Evidenze dell'Attacco}
+
+Di seguito viene mostrato l'avvio della procedura di cracking. Hydra inizia a combinare gli username e le password presenti nelle liste fornite.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{screen_hydra0.png}
+    \caption{Avvio dell'attacco Hydra contro l'IP 192.168.50.151. Si notano i tentativi di login falliti iniziali.}
+    \label{fig:hydra0}
+\end{figure}
+
+Durante l'esecuzione, lo strumento itera attraverso le combinazioni. Come evidenziato nello screenshot successivo, Hydra identifica una corrispondenza valida per l'utente \texttt{test\_user}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{screen_hydra1.png}
+    \caption{Rilevamento delle credenziali valide. La riga evidenziata in verde mostra: login: \textbf{test\_user}, password: \textbf{testpass}.}
+    \label{fig:hydra1}
+\end{figure}
+
+Al termine della scansione delle liste o al ritrovamento delle credenziali (a seconda della configurazione), Hydra termina l'esecuzione fornendo un riepilogo del successo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{screen_hydra2.png}
+    \caption{Conclusione dell'attacco: "1 valid password found". L'attacco ha avuto successo.}
+    \label{fig:hydra2}
+\end{figure}
+
+% -------------------------------------------------------------------
+% SEZIONE 4: ANALISI TECNICA - FTP
+% -------------------------------------------------------------------
+\section{Fase 2: Configurazione e Attacco FTP}
+
+Nella seconda fase dell'esercitazione, l'attenzione si è spostata sul protocollo di trasferimento file (FTP). A differenza di SSH, FTP trasmette le credenziali in chiaro (se non configurato in modalità sicura), ma è comunque soggetto ad attacchi di brute-force sull'autenticazione.
+
+\subsection{Configurazione del Servizio Target}
+Sulla macchina target è stato installato e attivato il demone \texttt{vsftpd} (Very Secure FTP Daemon), standard de facto per i sistemi Linux.
+
+\begin{lstlisting}[language=bash]
+sudo apt install vsftpd
+sudo service vsftpd start
+\end{lstlisting}
+
+Una volta confermato che il servizio fosse in ascolto sulla porta standard TCP/21, è stato preparato l'attacco.
+
+\subsection{Esecuzione dell'Attacco con Hydra}
+Utilizzando le stesse wordlist ottimizzate nella fase precedente (\texttt{xato-usernames.txt} e \texttt{xato-passwords.txt}), è stato lanciato Hydra specificando il protocollo \texttt{ftp}.
+
+\begin{lstlisting}[language=bash]
+hydra -L xato-usernames.txt -P xato-passwords.txt 192.168.50.151 ftp -V
+\end{lstlisting}
+
+\subsection{Evidenze dell'Attacco FTP}
+
+\begin{figure}[H]
+     \centering
+    \includegraphics[width=\linewidth]{screen_ftp0.png}
+     \caption{Esecuzione dell'attacco Hydra contro il servizio FTP.}
+ \end{figure}
+\subsection{Risultato}
+L'attacco ha avuto successo in tempi brevi grazie all'utilizzo delle liste filtrate. Hydra ha completato l'handshake e validato la combinazione corretta di username e password, permettendo l'accesso ai file del server.
+ \begin{figure}[H]
+     \centering
+      \includegraphics[width=\linewidth]{screen_ftp1.png}
+     \caption{Credenziali FTP individuate con successo.}
+ \end{figure}
+
+% -------------------------------------------------------------------
+% SEZIONE 5: RACCOMANDAZIONI
+% -------------------------------------------------------------------
+\newpage
+\section{Raccomandazioni e Mitigazione}
+
+L'esercitazione dimostra quanto sia banale compromettere un sistema che utilizza password deboli o presenti in dizionari comuni (come "testpass"). Per mitigare questi rischi in un ambiente di produzione, si raccomanda di:
+
+\begin{enumerate}
+    \item \textbf{Enforce Strong Passwords:} Imporre policy che richiedano password complesse, lunghe e non presenti in wordlist pubbliche.
+    \item \textbf{Rate Limiting e Fail2Ban:} Implementare strumenti come \textit{Fail2Ban} che bloccano temporaneamente gli IP dopo un numero definito di tentativi di login falliti, rendendo inefficaci gli attacchi brute-force.
+    \item \textbf{Autenticazione a Chiave Pubblica (SSH):} Disabilitare l'autenticazione via password per SSH e utilizzare esclusivamente chiavi RSA/Ed25519.
+    \item \textbf{Cambio Porte Standard:} Spostare i servizi dalle porte standard (22, 21) a porte non standard per evitare scansioni automatiche superficiali (security by obscurity, utile solo come misura aggiuntiva).
+\end{enumerate}
+
+\section{Conclusioni}
+Il report ha confermato la criticità delle configurazioni di default e l'importanza di password robuste. L'attacco ha permesso di ottenere accesso completo al sistema target in pochi minuti.
+
+\end{document}
